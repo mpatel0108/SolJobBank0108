@@ -1,0 +1,28 @@
+﻿
+PM> Commands...
+
+Add-Migration -Context JobBankContext -o Data\JBMigrations Initial
+Update-Database -Context JobBankContext
+Update-Database -Context ApplicationDbContext
+
+For Concurrency Control on Applicants
+            migrationBuilder.Sql(
+                @"
+                CREATE TRIGGER SetApplicantTimestampOnUpdate
+                AFTER UPDATE ON Applicants
+                BEGIN
+                    UPDATE Applicants
+                    SET RowVersion = randomblob(8)
+                    WHERE rowid = NEW.rowid;
+                END
+            ");
+            migrationBuilder.Sql(
+                        @"
+                CREATE TRIGGER SetApplicantTimestampOnInsert
+                AFTER INSERT ON Applicants
+                BEGIN
+                    UPDATE Applicants
+                    SET RowVersion = randomblob(8)
+                    WHERE rowid = NEW.rowid;
+                END
+            ");

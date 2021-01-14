@@ -1,0 +1,88 @@
+﻿@model IEnumerable<sol_Job_Bank.Models.Application>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>List of Applications</h1>
+
+@if (User.IsInRole("Admin") || User.IsInRole("Supervisor") || User.IsInRole("Staff"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+<table class="table">
+    <colgroup>
+        <col width="400" />
+        <col width="250" />
+        <col />
+        <col width="180" />
+    </colgroup>
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Posting)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Applicant)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comments)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Posting.PostingSummary)<br />
+                    @Html.DisplayFor(modelItem => item.Posting.OpeningsSummary)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Applicant.FullName)
+                </td>
+                <td>
+                    @{
+                        string[] noteWords = item.Comments.Split(' ');
+                        if (noteWords.Count() > 7)
+                        {
+                            <a class="" role="button" data-toggle="collapse" href="#collapseSum@(item.ID)" aria-expanded="false" aria-controls="collapseSum@(item.ID)">
+                                @(string.Join(" ", noteWords.Take(7)) + "...")
+                            </a>
+                            <div class="collapse" id="collapseSum@(item.ID)">
+                                <div class="well">
+                                    @(string.Join(" ", noteWords.Skip(7)))
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            @item.Comments
+                        }
+                    }
+                </td>
+                <td>
+                    @{
+                        if (User.IsInRole("Staff"))
+                        {
+                            <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                            if (User.Identity.Name == item.CreatedBy)
+                            {
+                                @: | @{<a asp-action="Edit" asp-route-id="@item.ID">Edit</a>}
+                            }
+                        }
+                        else if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                        {
+                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> @:|
+                            <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> @:|
+                            <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

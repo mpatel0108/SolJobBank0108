@@ -1,0 +1,77 @@
+﻿@model IEnumerable<sol_Job_Bank.Models.Posting>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>List of Postings</h1>
+
+@if (User.IsInRole("Admin") || User.IsInRole("Supervisor") || User.IsInRole("Staff"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+<form asp-action="Index" method="get">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.PostingSummary)
+                </th>
+                <th>
+                    #Openings
+                </th>
+                <th>
+                    #Applications
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.StartDate)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PostingSummary)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NumberOpen)
+                    </td>
+                    <td>
+                        @item.Applications.Count()
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                        @{
+                            if (User.IsInRole("Staff"))
+                            {
+                                @: | @{<a asp-action="Notification" asp-route-id="@item.ID" asp-route-PostingSummary="@item.PostingSummary">Send Email</a>}
+                                if (User.Identity.Name == item.CreatedBy)
+                                {
+                                    @: |
+                                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
+                                }
+                            }
+                            else if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                            {
+                                @: |
+                                <a asp-action="Notification" asp-route-id="@item.ID" asp-route-PostingSummary="@item.PostingSummary">Send Email</a> @:|
+                                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> @:|
+                                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a> @:|
+                            }
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <partial name="_PagingNavBar" />
+</form>

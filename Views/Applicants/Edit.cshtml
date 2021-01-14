@@ -1,0 +1,166 @@
+﻿@model sol_Job_Bank.Models.Applicant
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Applicant</h4>
+<hr />
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row">
+        <div class="col-md-8 ml-3">
+            @{
+                if (Model.ApplicantPhoto != null)
+                {
+                    if (Model.ApplicantPhoto.PhotoContentFull.Content != null && Model.ApplicantPhoto.PhotoContentFull.MimeType.Contains("image"))
+                    {
+                        string imageBase64 = Convert.ToBase64String(Model.ApplicantPhoto.PhotoContentFull.Content);
+                        string imageSrc = string.Format("data:" + Model.ApplicantPhoto.PhotoContentFull.MimeType + ";base64,{0}", imageBase64);
+                        <div class="row">
+                            <img src="@imageSrc" alt="Profile Picture of @Model.FullName" title="Profile Picture of @Model.FullName" style="max-height: 500px; max-width: 600px" class="img-fluid rounded" /><br />
+                        </div>
+                        <div class="row">
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" id="chkRemoveImage" name="chkRemoveImage" /> <strong>Check to remove Image</strong>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <input type="hidden" asp-for="ID" />
+            <input type="hidden" asp-for="RowVersion" />
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MiddleName" class="control-label"></label>
+                <input asp-for="MiddleName" class="form-control" />
+                <span asp-validation-for="MiddleName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RetrainingProgramID" class="control-label"></label>
+                <select asp-for="RetrainingProgramID" class="form-control" asp-items="ViewBag.RetrainingProgramID">
+                    <option value="">None</option>
+                </select>
+                <span asp-validation-for="RetrainingProgramID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Upload Additional Documents:</label>
+                <input type="file" class="" name="theFiles" multiple="multiple" />
+            </div>
+            <div class="form-group custom-file mt-4 mb-3">
+                <label class="control-label custom-file-label">Picture File:</label>
+                <input type="file" class="custom-file-input" name="thePicture" /><br />
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="form-group">
+                <label asp-for="SIN" class="control-label"></label>
+                <input asp-for="SIN" class="form-control" />
+                <span asp-validation-for="SIN" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="eMail" class="control-label"></label>
+                <input asp-for="eMail" class="form-control" />
+                <span asp-validation-for="eMail" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label"> Current Documents:</label>
+                <div class="ml-md-3">
+                    @{
+                        int fileCount = Model.ApplicantDocuments.Count;
+                        if (fileCount > 0)
+                        {
+                            <a class="" role="button" data-toggle="collapse" href="#collapseSum@(Model.ID)" aria-expanded="false" aria-controls="collapseSum@(Model.ID)">
+                                <span class="badge badge-info">@fileCount</span> Current Documents...
+                            </a>
+                            <div class="collapse" id="collapseSum@(Model.ID)">
+                                <table class="table">
+                                    @foreach (var d in Model.ApplicantDocuments)
+                                    {
+                                        <tr>
+                                            <td><a asp-action="Download" asp-route-id="@d.ID">@d.FileName</a></td>
+                                            <td><a asp-controller="ApplicantDocuments" asp-action="Edit" asp-route-id="@d.ID">Edit</a></td>
+                                            <td><a asp-controller="ApplicantDocuments" asp-action="Delete" asp-route-id="@d.ID">Delete</a></td>
+                                        </tr>
+                                    }
+                                </table>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 offset-1">
+            <div class="form-group">
+                <label class="control-label">@Html.DisplayNameFor(model => model.ApplicantSkills)</label>
+                <div class="col-md-offset-1">
+                    <table>
+                        <tr>
+                            @{
+                                int cnt = 0;
+                                List<sol_Job_Bank.ViewModels.OptionVM> checkboxes = ViewBag.SkillOptions;
+                                foreach (var checkbox in checkboxes)
+                                {
+                                    if (cnt++ % 3 == 0)
+                                    {
+                                    @:</tr><tr>
+                                    }
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedOptions"
+                                               value="@checkbox.ID"
+                                               @(Html.Raw(checkbox.Assigned ? "checked=\"checked\"" : "")) />
+                                        @checkbox.DisplayText @:&nbsp;&nbsp;
+                                    @:</td>
+                                }
+                            @:</tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+
+            </div>
+        </div>
+    </form>
+    <div>
+        <a href='@ViewData["returnURL"]'>Back to List of Applicants</a>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script type="text/javascript">
+            // Add the following code if you want the name of the file appear on select
+            $(".custom-file-input").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
+        </script>
+    }

@@ -1,0 +1,47 @@
+﻿@model sol_Job_Bank.Models.ApplicantDocument
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Applicant Document</h4>
+<hr />
+<form asp-action="Edit">
+    <input type="hidden" asp-for="ID" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="ApplicantID" class="control-label"></label>
+                <label class="form-control">@Model.Applicant.FullName</label>
+            </div>
+            <div class="form-group">
+                <label asp-for="MimeType" class="control-label"></label>
+                <label class="form-control">@Model.MimeType</label>
+            </div>
+            <div class="form-group">
+                <label asp-for="FileName" class="control-label"></label>
+                <input asp-for="FileName" class="form-control" />
+                <span asp-validation-for="FileName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Details" asp-controller="Applicants" asp-route-id="@Model.ApplicantID">Back to Details for @Model.Applicant.FullName</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
